@@ -1,0 +1,165 @@
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Controle Financeiro</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div id="app">
+        <!-- Página Inicial -->
+        <div id="home-page" class="page active">
+            <h1>Controle Financeiro</h1>
+            <div class="buttons">
+                <button onclick="showCreateYearModal()">Criar Ano</button>
+                <button onclick="showYearList()">Selecionar Ano</button>
+                <button onclick="resetAllData()">Resetar Dados</button>
+            </div>
+        </div>
+
+        <!-- Lista de Anos -->
+        <div id="year-list" class="page">
+            <h2>Anos Cadastrados</h2>
+            <div id="years-container"></div>
+            <button onclick="showHomePage()">Voltar</button>
+        </div>
+
+        <!-- Tela do Ano -->
+        <div id="year-page" class="page">
+            <h2>Ano: <span id="selected-year"></span></h2>
+            <div class="buttons">
+                <button onclick="showAddFixedExpenseModal()">Adicionar Despesa Fixa</button>
+                <button onclick="showAddFixedIncomeModal()">Adicionar Receita Fixa</button>
+            </div>
+            <div id="months-grid"></div>
+            <button onclick="showYearList()">Voltar</button>
+        </div>
+
+        <!-- Tela do Mês -->
+        <div id="month-page" class="page">
+            <h2>Mês: <span id="selected-month"></span></h2>
+            <div class="expenses-container">
+                <div class="expenses-section">
+                    <h3>Despesas Fixas</h3>
+                    <div id="fixed-expenses"></div>
+                </div>
+                <div class="expenses-section">
+                    <h3>Despesas Variáveis</h3>
+                    <div id="variable-expenses"></div>
+                </div>
+                <div class="expenses-section">
+                    <h3>Cartão de Crédito (Próprio)</h3>
+                    <div id="credit-card-expenses"></div>
+                </div>
+                <div class="expenses-section">
+                    <h3>Cartão de Crédito (Terceiros)</h3>
+                    <div id="third-party-credit-card-expenses"></div>
+                </div>
+                <div class="expenses-section">
+                    <div id="bank-totals"></div>
+                </div>
+                <div class="expenses-section">
+                    <h3>Receitas</h3>
+                    <div id="income-section"></div>
+                </div>
+            </div>
+            <div class="total-section">
+                <h3>Total do Mês: R$ <span id="month-total">0.00</span></h3>
+                <h3>Receitas Totais do Mês: R$ <span id="income-total">0.00</span></h3>
+                <h3>Restante do Mês: R$ <span id="remaining-total">0.00</span></h3>
+            </div>
+            <div class="buttons">
+                <button onclick="showAddVariableExpenseModal()">Adicionar Despesa Variável</button>
+                <button onclick="showAddCreditCardModal()">Adicionar Cartão de Crédito</button>
+                <button onclick="showAddIncomeModal()">Adicionar Receita</button>
+                <button onclick="showYearPage(currentYear)">Voltar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modais -->
+    <div id="create-year-modal" class="modal">
+        <div class="modal-content">
+            <h3>Criar Novo Ano</h3>
+            <input type="number" id="new-year-input" placeholder="Digite o ano">
+            <div class="buttons">
+                <button onclick="createYear()">Criar</button>
+                <button onclick="closeModal('create-year-modal')">Cancelar</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="add-fixed-expense-modal" class="modal">
+        <div class="modal-content">
+            <h3>Adicionar Despesa Fixa</h3>
+            <input type="text" id="fixed-expense-name" placeholder="Nome da despesa">
+            <input type="number" id="fixed-expense-amount" placeholder="Valor">
+            <div class="buttons">
+                <button onclick="addFixedExpense()">Adicionar</button>
+                <button onclick="closeModal('add-fixed-expense-modal')">Cancelar</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="add-variable-expense-modal" class="modal">
+        <div class="modal-content">
+            <h3>Adicionar Despesa Variável</h3>
+            <input type="text" id="variable-expense-name" placeholder="Nome da despesa">
+            <input type="number" id="variable-expense-amount" placeholder="Valor">
+            <div class="buttons">
+                <button onclick="addVariableExpense()">Adicionar</button>
+                <button onclick="closeModal('add-variable-expense-modal')">Cancelar</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="add-credit-card-modal" class="modal">
+        <div class="modal-content">
+            <h3>Adicionar Despesa de Cartão</h3>
+            <select id="card-bank" onchange="toggleBankInput()">
+                <!-- Options will be populated dynamically -->
+            </select>
+            <input type="text" id="new-bank-input" placeholder="Nome do novo banco" style="display: none;">
+            <button onclick="addNewBank()" id="add-bank-btn" style="display: none;">Adicionar Banco</button>
+            <input type="text" id="card-expense-name" placeholder="Nome da despesa">
+            <input type="number" id="card-expense-amount" placeholder="Valor">
+            <input type="number" id="card-installments" placeholder="Número de parcelas">
+            <select id="card-responsible" onchange="togglePersonNameField()">
+                <option value="self">Próprio</option>
+                <option value="other">Terceiro</option>
+            </select>
+            <input type="text" id="person-name" placeholder="Nome da pessoa" style="display: none;">
+            <div class="buttons">
+                <button onclick="addCreditCardExpense()">Adicionar</button>
+                <button onclick="closeModal('add-credit-card-modal')">Cancelar</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="add-income-modal" class="modal">
+        <div class="modal-content">
+            <h3>Adicionar Receita</h3>
+            <input type="text" id="income-name" placeholder="Descrição da receita">
+            <input type="number" id="income-amount" placeholder="Valor">
+            <div class="buttons">
+                <button onclick="addIncome()">Adicionar</button>
+                <button onclick="closeModal('add-income-modal')">Cancelar</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="add-fixed-income-modal" class="modal">
+        <div class="modal-content">
+            <h3>Adicionar Receita Fixa</h3>
+            <input type="text" id="fixed-income-name" placeholder="Nome da receita">
+            <input type="number" id="fixed-income-amount" placeholder="Valor">
+            <div class="buttons">
+                <button onclick="addFixedIncome()">Adicionar</button>
+                <button onclick="closeModal('add-fixed-income-modal')">Cancelar</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
